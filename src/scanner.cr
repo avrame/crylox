@@ -62,14 +62,27 @@ class Scanner
     when '>' then add_token(match('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER)
     when '/' then
       if match '/'
+        # It's a single-line comment
         while peek != '\n' && !is_at_end?
+          advance
+        end
+      elsif match '*'
+        # It's a block comment
+        until (peek == '*' && peek_next == '/') || is_at_end?
+          char = advance
+          if char == '\n'
+            @line += 1
+          end
+        end
+        if !is_at_end?
+          advance
           advance
         end
       else
         add_token TokenType::SLASH
       end
     when ' ', '\r', '\t'
-      #noop
+      # noop
     when '\n'
       @line += 1
     when '"' then string
