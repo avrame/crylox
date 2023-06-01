@@ -68,14 +68,18 @@ class Scanner
         end
       elsif match '*'
         # It's a block comment
-        until (peek == '*' && peek_next == '/') || is_at_end?
+        depth = 1
+        until depth == 0 || is_at_end?
           char = advance
           if char == '\n'
             @line += 1
+          elsif char == '*' && peek == '/'
+            depth -= 1
+          elsif char == '/' && peek == '*'
+            depth += 1
           end
         end
         if !is_at_end?
-          advance
           advance
         end
       else
