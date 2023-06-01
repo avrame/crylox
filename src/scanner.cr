@@ -3,6 +3,24 @@ require "./token"
 require "./crylox"
 
 class Scanner
+  @@keywords = {
+    "and" => TokenType::AND,
+    "class" => TokenType::CLASS,
+    "else" => TokenType::ELSE,
+    "false" => TokenType::FALSE,
+    "for" => TokenType::FOR,
+    "fun" => TokenType::FUN,
+    "if" => TokenType::IF,
+    "nil" => TokenType::NIL,
+    "or" => TokenType::OR,
+    "print" => TokenType::PRINT,
+    "return" => TokenType::RETURN,
+    "super" => TokenType::SUPER,
+    "this" => TokenType::THIS,
+    "true" => TokenType::TRUE,
+    "var" => TokenType::VAR,
+    "while" => TokenType::WHILE,
+  }
   @tokens = [] of Token
   @start : Int64 = 0
   @current : Int64 = 0
@@ -55,6 +73,8 @@ class Scanner
     when '\n'
       @line += 1
     when '"' then string
+    when .number? then number
+    when .letter? then identifier
     else Crylox.error @line, "Unexpected character."
     end
   end
@@ -69,7 +89,7 @@ class Scanner
     add_token type, nil
   end
 
-  private def add_token(type : TokenType, literal : String | Nil)
+  private def add_token(type : TokenType, literal : String | Float64 | Nil)
     text = @source[@start...@current]
     @tokens << Token.new type, text, literal, @line
   end
@@ -94,6 +114,13 @@ class Scanner
     @source[@current]
   end
 
+  private def peek_next()
+    if @current + 1 >= @source.size
+      return '\0'
+    end
+    @source[@current + 1]
+  end
+
   private def string()
     while peek != '"' && !is_at_end?
       if peek == '\n'
@@ -113,5 +140,34 @@ class Scanner
     # Trim the surrounding quotes.
     value = @source[@start + 1...@current - 1]
     add_token TokenType::STRING, value
+  end
+
+  private def number()
+    while peek.number?
+      advance
+    end
+
+    if peek == '.' && peek_next.number?
+      # consume the "."
+      advance
+      while peek.number?
+        advance
+      end
+    end
+
+    add_token TokenType::NUMBER, @source[@start...@current].to_f64
+  end
+
+  private def identifier()
+    while peek.alphanumeric? || peek == '_'
+      advance
+    end
+    text = @source[@start...@current]
+    type = @@keywords[text]?
+    if type.nil?
+      type = TokenType::IDENTIFIER
+    end
+
+    add_token type
   end
 end

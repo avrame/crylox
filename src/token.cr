@@ -1,7 +1,7 @@
 require "./token_type"
 
 class Token
-  def initialize(@type : TokenType, @lexeme : String, @literal : String | Nil, @line : Int64)
+  def initialize(@type : TokenType, @lexeme : String, @literal : String | Float64 | Nil, @line : Int64)
   end
 
   def to_s()

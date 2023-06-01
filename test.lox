@@ -1,4 +1,7 @@
 // this is a comment
 (( )){} // grouping stuff
 "Hello, World!" // A string
+3.1415 // A number
+my_var // An identifier
+while // A keyword
 !*+-/=<> <= == // operators
