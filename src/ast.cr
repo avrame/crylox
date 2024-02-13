@@ -1,9 +1,50 @@
 require "./token"
 
+EXPR_TYPES = [
+  {
+    class:  Binary,
+    fields: [
+      {type: Expr, name: left},
+      {type: Token, name: operator},
+      {type: Expr, name: right},
+    ],
+  },
+  {
+    class:  Grouping,
+    fields: [
+      {type: Expr, name: expression},
+    ],
+  },
+  {
+    class:  Literal,
+    fields: [
+      {type: LiteralType, name: value},
+    ],
+  },
+  {
+    class:  Unary,
+    fields: [
+      {type: Token, name: operator},
+      {type: Expr, name: right},
+    ],
+  },
+]
+
 module Crylox
-  macro define_ast(base_name, types)
+  macro define_visitor(base_name)
+    abstract class Visitor(T)
+      {% for type in EXPR_TYPES %}
+        def visit_{{ type[:class].id.downcase }}_{{ base_name.id }}(expr : {{ type[:class].id }}) : T
+        end
+      {% end %}
+    end
+  end
+
+  macro define_ast(base_name)
     abstract class {{ base_name.id }}
-    {% for type in types %}
+    end
+
+    {% for type in EXPR_TYPES %}
       {% fields = type[:fields] %}
       class {{ type[:class].id }} < {{ base_name.id }}
         {% for field in fields %}
@@ -26,42 +67,15 @@ module Crylox
           {% end %}
         end
 
-        {% visit_class = "visit#{type[:class].id}#{base_name.id}" %}
-        def accept(visitor)
+        {% visit_class = "visit_#{type[:class].id}_#{base_name.id}" %}
+        def accept(visitor : Visitor)
           visitor.{{ visit_class.id }}(self)
         end
       end
     {% end %}
-    end
   end
 
-  define_ast Expr, [
-    {
-      class:  Binary,
-      fields: [
-        {type: Expr, name: left},
-        {type: Token, name: operator},
-        {type: Expr, name: right},
-      ],
-    },
-    {
-      class:  Grouping,
-      fields: [
-        {type: Expr, name: expression},
-      ],
-    },
-    {
-      class:  Literal,
-      fields: [
-        {type: LiteralType, name: value},
-      ],
-    },
-    {
-      class:  Unary,
-      fields: [
-        {type: Token, name: operator},
-        {type: Expr, name: right},
-      ],
-    },
-  ]
+  define_visitor Expr
+
+  define_ast Expr
 end

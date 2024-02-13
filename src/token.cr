@@ -52,6 +52,8 @@ module Crylox
   end
 
   class Token
+    property lexeme : String
+
     def initialize(@type : TokenType, @lexeme : String, @literal : LiteralType, @line : Int64)
     end
 
