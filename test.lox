@@ -1,13 +1,2 @@
-// this is a comment
-
-/* This is a multi-line
-comment and it should ignore any keywords like if or while
-or operators like + * / == etc.
-it should also allow /* nesting comments */ without choking! */
-
-(( )){} // grouping stuff
-"Hello, World!" // A string
-3.1415 // A number
-my_var // An identifier
-while // A keyword
-!*+-/=<> <= == // operators
+// Ignore comments
+(5 * 3 + 6 >= 2 / 3)

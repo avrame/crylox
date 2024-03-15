@@ -18,15 +18,15 @@ module Crylox
       expr.accept(self)
     end
 
-    def visit_Binary_Expr(expr : Binary)
+    def visit_binary_expr(expr : Binary)
       parenthesize(expr.operator.lexeme, expr.left, expr.right)
     end
 
-    def visit_Grouping_Expr(expr : Grouping)
+    def visit_grouping_expr(expr : Grouping)
       parenthesize("group", expr.expression)
     end
 
-    def visit_Literal_Expr(expr : Literal)
+    def visit_literal_expr(expr : Literal)
       if expr.value.nil?
         return "nil"
       else
@@ -34,7 +34,7 @@ module Crylox
       end
     end
 
-    def visit_Unary_Expr(expr : Unary)
+    def visit_unary_expr(expr : Unary)
       parenthesize(expr.operator.lexeme, expr.right)
     end
 

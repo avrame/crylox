@@ -1,5 +1,7 @@
 require "./scanner"
+require "./parser"
 require "./ast"
+require "./ast_printer"
 
 module Crylox
   if ARGV.size > 1
@@ -37,15 +39,31 @@ module Crylox
 
     def self.run(source)
       puts "Running #{source}"
-      scanner = Scanner.new source
+      scanner = Scanner.new(source)
       tokens = scanner.scan_tokens
-      tokens.each do |token|
-        puts token.to_s
+      parser = Parser.new(tokens)
+      expression = parser.parse
+
+      if @@had_error
+        return
+      end
+
+      unless expression.nil?
+        ast_printer = AstPrinter.new
+        puts ast_printer.print(expression)
       end
     end
 
     def self.error(line : Int, message : String)
       report line, "", message
+    end
+
+    def self.error(token : Token, message : String)
+      if token.type == TokenType::EOF
+        report token.line, " at end", message
+      else
+        report token.line, " at '#{token.lexeme}'", message
+      end
     end
 
     def self.report(line : Int, where : String, message : String)

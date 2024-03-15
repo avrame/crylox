@@ -34,10 +34,11 @@ module Crylox
   macro define_visitor(base_name)
     abstract class Visitor(T)
       {% for type in EXPR_TYPES %}
-        def visit_{{ type[:class].id.downcase }}_{{ base_name.id }}(expr : {{ type[:class].id }}) : T
+        def visit_{{ type[:class].id.downcase }}_{{ base_name.id.downcase }}(expr : {{ type[:class].id }}) : T
         end
       {% end %}
     end
+    {% debug %}
   end
 
   macro define_ast(base_name)
@@ -67,12 +68,13 @@ module Crylox
           {% end %}
         end
 
-        {% visit_class = "visit_#{type[:class].id}_#{base_name.id}" %}
+        {% visit_class = "visit_#{type[:class].id.downcase}_#{base_name.id.downcase}" %}
         def accept(visitor : Visitor)
           visitor.{{ visit_class.id }}(self)
         end
       end
     {% end %}
+    {% debug %}
   end
 
   define_visitor Expr

@@ -1,5 +1,5 @@
 module Crylox
-  alias LiteralType = Int32 | String | Char | Float64 | Nil
+  alias LiteralType = Int32 | String | Char | Float64 | Nil | Bool
 
   enum TokenType
     # Single-character tokens.
@@ -53,6 +53,9 @@ module Crylox
 
   class Token
     property lexeme : String
+    getter type : TokenType
+    getter literal : LiteralType
+    getter line : Int64
 
     def initialize(@type : TokenType, @lexeme : String, @literal : LiteralType, @line : Int64)
     end
