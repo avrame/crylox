@@ -38,7 +38,6 @@ module Crylox
         end
       {% end %}
     end
-    {% debug %}
   end
 
   macro define_ast(base_name)
@@ -74,7 +73,6 @@ module Crylox
         end
       end
     {% end %}
-    {% debug %}
   end
 
   define_visitor Expr
