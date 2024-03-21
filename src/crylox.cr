@@ -7,7 +7,7 @@ require "./interpreter"
 
 module Crylox
   if ARGV.size > 1
-    puts "Usage: jlox [script]"
+    puts "Usage: crylox [script]"
     exit 64
   elsif ARGV.size == 1
     Lox.run_file ARGV[0]
