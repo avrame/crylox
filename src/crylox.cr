@@ -45,7 +45,7 @@ module Crylox
     end
 
     def self.run(source)
-      puts "Running #{source}"
+      puts "\n\nRunning:\n#{source}"
       scanner = Scanner.new(source)
       tokens = scanner.scan_tokens
       parser = Parser.new(tokens)
@@ -57,7 +57,7 @@ module Crylox
 
       unless expression.nil?
         ast_printer = AstPrinter.new
-        puts ast_printer.print(expression)
+        puts "\n\nAST: #{ast_printer.print(expression)}"
         @@interpreter.interpret(expression)
       end
     end
@@ -75,7 +75,7 @@ module Crylox
     end
 
     def self.runtime_exception(exception : RuntimeException)
-      puts "#{exception.message}\n[line #{exception.token.line}]"
+      puts "\n\n#{exception.message}\n[line #{exception.token.line}]"
       @@had_runtime_exception = true
     end
 

@@ -73,6 +73,9 @@ module Crylox
         raise RuntimeException.new expr.operator, "Invalid Operands for + operator"
       when TokenType::SLASH
         check_number_operands(expr.operator, left, right)
+        if right == 0
+          raise RuntimeException.new expr.operator, "Attempted to divide by zero"
+        end
         return left.as(Float64) / right.as(Float64)
       when TokenType::STAR
         check_number_operands(expr.operator, left, right)
