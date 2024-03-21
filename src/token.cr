@@ -1,5 +1,5 @@
 module Crylox
-  alias LiteralType = Int32 | String | Char | Float64 | Nil | Bool
+  alias LiteralType = String | Char | Float64 | Nil | Bool
 
   enum TokenType
     # Single-character tokens.

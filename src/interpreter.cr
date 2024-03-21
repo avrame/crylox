@@ -64,7 +64,13 @@ module Crylox
         if left.is_a? String && right.is_a? String
           return left + right
         end
-        raise RuntimeException.new expr.operator, "Operands must be two numbers or two strings"
+        if left.is_a? String
+          return left + stringify(right)
+        end
+        if right.is_a? String
+          return stringify(left) + right
+        end
+        raise RuntimeException.new expr.operator, "Invalid Operands for + operator"
       when TokenType::SLASH
         check_number_operands(expr.operator, left, right)
         return left.as(Float64) / right.as(Float64)
