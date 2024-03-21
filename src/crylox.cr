@@ -2,6 +2,8 @@ require "./scanner"
 require "./parser"
 require "./ast"
 require "./ast_printer"
+require "./runtime_exception"
+require "./interpreter"
 
 module Crylox
   if ARGV.size > 1
@@ -14,15 +16,20 @@ module Crylox
   end
 
   class Lox
-    @@had_error = false
+    @@had_exception = false
+    @@had_runtime_exception = false
+    @@interpreter = Interpreter.new
 
     def self.run_file(file_path)
       puts "Opening #{file_path}..."
       content = File.read(file_path)
       # puts "Running #{content}..."
       run content
-      if @@had_error
+      if @@had_exception
         exit 65
+      end
+      if @@had_runtime_exception
+        exit 70
       end
     end
 
@@ -44,13 +51,14 @@ module Crylox
       parser = Parser.new(tokens)
       expression = parser.parse
 
-      if @@had_error
+      if @@had_exception
         return
       end
 
       unless expression.nil?
         ast_printer = AstPrinter.new
         puts ast_printer.print(expression)
+        @@interpreter.interpret(expression)
       end
     end
 
@@ -66,9 +74,14 @@ module Crylox
       end
     end
 
+    def self.runtime_exception(exception : RuntimeException)
+      puts "#{exception.message}\n[line #{exception.token.line}]"
+      @@had_runtime_exception = true
+    end
+
     def self.report(line : Int, where : String, message : String)
       puts "[line #{line}] Error#{where}: #{message}"
-      @@had_error = true
+      @@had_exception = true
     end
   end
 end

@@ -120,12 +120,13 @@ module Crylox
     def synchronize
       advance()
       while !is_at_end()
-        if previous().type == :SEMICOLON
+        if previous().type == TokenType
+          :SEMICOLON
           return
         end
 
         case peek().type
-        when :CLASS | :FUN | :VAR | :FOR | :IF | :WHILE | :PRINT | :RETURN
+        when TokenType::CLASS | TokenType::FUN | TokenType::VAR | TokenType::FOR | TokenType::IF | TokenType::WHILE | TokenType::PRINT | TokenType::RETURN
           return
         end
 
