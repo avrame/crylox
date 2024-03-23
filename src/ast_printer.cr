@@ -2,7 +2,10 @@ require "./ast"
 require "./token"
 
 module Crylox
-  class AstPrinter < Visitor(String)
+  class AstPrinter
+    include ExprVisitor(String)
+    include StmtVisitor(Nil)
+
     def print(expr : Expr)
       expr.accept(self)
     end

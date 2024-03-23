@@ -4,11 +4,15 @@ require "./crylox"
 require "./runtime_exception"
 
 module Crylox
-  class Interpreter < Visitor(Object)
-    def interpret(expression : Expr)
+  class Interpreter
+    include ExprVisitor(Object)
+    include StmtVisitor(Nil)
+
+    def interpret(statements : Array(Stmt))
       begin
-        value = evaluate(expression)
-        puts stringify(value)
+        statements.each do |statement|
+          execute(statement)
+        end
       rescue exception : RuntimeException
         Lox.runtime_exception(exception)
       end
@@ -47,6 +51,19 @@ module Crylox
 
     def evaluate(expr : Expr)
       expr.accept(self)
+    end
+
+    def execute(stmt : Stmt)
+      stmt.accept(self)
+    end
+
+    def visit_expression_stmt(stmt : Expression)
+      evaluate(stmt.expression)
+    end
+
+    def visit_print_stmt(stmt : Print)
+      value = evaluate(stmt.expression)
+      puts stringify(value)
     end
 
     def visit_binary_expr(expr : Binary)

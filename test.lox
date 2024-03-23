@@ -1,2 +1,4 @@
 // Ignore comments
-"(4 * 3) / 6 = " + (4 * 3) / 6  
+print "one";
+print true;
+print 2 + 1;

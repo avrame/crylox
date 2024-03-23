@@ -1,50 +1,20 @@
 require "./token"
 
-EXPR_TYPES = [
-  {
-    class:  Binary,
-    fields: [
-      {type: Expr, name: left},
-      {type: Token, name: operator},
-      {type: Expr, name: right},
-    ],
-  },
-  {
-    class:  Grouping,
-    fields: [
-      {type: Expr, name: expression},
-    ],
-  },
-  {
-    class:  Literal,
-    fields: [
-      {type: LiteralType, name: value},
-    ],
-  },
-  {
-    class:  Unary,
-    fields: [
-      {type: Token, name: operator},
-      {type: Expr, name: right},
-    ],
-  },
-]
-
 module Crylox
-  macro define_visitor(base_name)
-    abstract class Visitor(T)
-      {% for type in EXPR_TYPES %}
+  macro define_visitor(base_name, types)
+    module {{base_name}}Visitor(T)
+      {% for type in types %}
         def visit_{{ type[:class].id.downcase }}_{{ base_name.id.downcase }}(expr : {{ type[:class].id }}) : T
         end
       {% end %}
     end
   end
 
-  macro define_ast(base_name)
+  macro define_ast(base_name, types)
     abstract class {{ base_name.id }}
     end
 
-    {% for type in EXPR_TYPES %}
+    {% for type in types %}
       {% fields = type[:fields] %}
       class {{ type[:class].id }} < {{ base_name.id }}
         {% for field in fields %}
@@ -68,14 +38,61 @@ module Crylox
         end
 
         {% visit_class = "visit_#{type[:class].id.downcase}_#{base_name.id.downcase}" %}
-        def accept(visitor : Visitor)
+        def accept(visitor)
           visitor.{{ visit_class.id }}(self)
         end
       end
     {% end %}
   end
 
-  define_visitor Expr
+  EXPR_TYPES = [
+    {
+      class:  Binary,
+      fields: [
+        {type: Expr, name: left},
+        {type: Token, name: operator},
+        {type: Expr, name: right},
+      ],
+    },
+    {
+      class:  Grouping,
+      fields: [
+        {type: Expr, name: expression},
+      ],
+    },
+    {
+      class:  Literal,
+      fields: [
+        {type: LiteralType, name: value},
+      ],
+    },
+    {
+      class:  Unary,
+      fields: [
+        {type: Token, name: operator},
+        {type: Expr, name: right},
+      ],
+    },
+  ]
 
-  define_ast Expr
+  define_visitor Expr, {{EXPR_TYPES}}
+  define_ast Expr, {{EXPR_TYPES}}
+
+  STMT_TYPES = [
+    {
+      class:  Expression,
+      fields: [
+        {type: Expr, name: expression},
+      ],
+    },
+    {
+      class:  Print,
+      fields: [
+        {type: Expr, name: expression},
+      ],
+    },
+  ]
+
+  define_visitor Stmt, {{STMT_TYPES}}
+  define_ast Stmt, {{STMT_TYPES}}
 end

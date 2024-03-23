@@ -9,21 +9,40 @@ module Crylox
     end
 
     def parse
-      begin
-        return expression()
-      rescue
-        return nil
+      statements = [] of Stmt
+      while !is_at_end
+        statements << statement()
       end
+      statements
     end
 
     def expression
       return equality()
     end
 
+    def statement
+      if match :PRINT
+        return print_statement()
+      end
+      expression_statement()
+    end
+
+    def print_statement
+      value = expression()
+      consume :SEMICOLON, "Expect ';' after value."
+      Print.new(value)
+    end
+
+    def expression_statement
+      expr = expression()
+      consume :SEMICOLON, "Expect ';' after expression."
+      Expression.new(expr)
+    end
+
     def equality
       expr = comparison()
 
-      while match(:BANG_EQUAL, :EQUAL_EQUAL)
+      while match :BANG_EQUAL, :EQUAL_EQUAL
         operator = previous()
         right = comparison()
         expr = Binary.new(expr, operator, right)
@@ -35,7 +54,7 @@ module Crylox
     def comparison : Expr
       expr = term()
 
-      while match(:GREATER, :GREATER_EQUAL, :LESS, :LESS_EQUAL)
+      while match :GREATER, :GREATER_EQUAL, :LESS, :LESS_EQUAL
         operator = previous()
         right = term()
         expr = Binary.new(expr, operator, right)
@@ -47,7 +66,7 @@ module Crylox
     def term : Expr
       expr = factor()
 
-      while match(:MINUS, :PLUS)
+      while match :MINUS, :PLUS
         operator = previous()
         right = factor()
         expr = Binary.new(expr, operator, right)
@@ -59,7 +78,7 @@ module Crylox
     def factor : Expr
       expr = unary()
 
-      while match(:SLASH, :STAR)
+      while match :SLASH, :STAR
         operator = previous()
         right = unary()
         expr = Binary.new(expr, operator, right)
@@ -69,7 +88,7 @@ module Crylox
     end
 
     def unary : Expr
-      if match(:BANG, :MINUS)
+      if match :BANG, :MINUS
         operator = previous()
         right = unary()
         return Unary.new(operator, right)
@@ -79,23 +98,23 @@ module Crylox
     end
 
     def primary : Expr
-      if match(:FALSE)
+      if match :FALSE
         return Literal.new(false)
       end
 
-      if match(:TRUE)
+      if match :TRUE
         return Literal.new(true)
       end
 
-      if match(:NIL)
+      if match :NIL
         return Literal.new(nil)
       end
 
-      if match(:NUMBER, :STRING)
+      if match :NUMBER, :STRING
         return Literal.new(previous().literal)
       end
 
-      if match(:LEFT_PAREN)
+      if match :LEFT_PAREN
         expr = expression()
         consume(:RIGHT_PAREN, "Expect ')' after expression.")
         return Grouping.new(expr)
@@ -119,7 +138,7 @@ module Crylox
 
     def synchronize
       advance()
-      while !is_at_end()
+      while !is_at_end
         if previous().type == TokenType
           :SEMICOLON
           return
@@ -153,14 +172,14 @@ module Crylox
     end
 
     def advance : Token
-      if !is_at_end()
+      if !is_at_end
         @current += 1
       end
       previous()
     end
 
     def is_at_end
-      return peek().type == :EOF
+      return peek().type == TokenType::EOF
     end
 
     def peek : Token
