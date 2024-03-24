@@ -15,12 +15,13 @@ module Crylox
     Lox.run_prompt
   end
 
-  class Lox
+  module Lox
+    extend self
     @@had_exception = false
     @@had_runtime_exception = false
     @@interpreter = Interpreter.new
 
-    def self.run_file(file_path)
+    def run_file(file_path)
       puts "Opening #{file_path}..."
       content = File.read(file_path)
       # puts "Running #{content}..."
@@ -33,7 +34,7 @@ module Crylox
       end
     end
 
-    def self.run_prompt
+    def run_prompt
       loop do
         print "> "
         line = gets
@@ -44,7 +45,7 @@ module Crylox
       end
     end
 
-    def self.run(source)
+    def run(source)
       puts "\n\nRunning:\n#{source}\n\n"
       scanner = Scanner.new(source)
       tokens = scanner.scan_tokens
@@ -58,11 +59,11 @@ module Crylox
       @@interpreter.interpret(statements)
     end
 
-    def self.error(line : Int, message : String)
+    def error(line : Int, message : String)
       report line, "", message
     end
 
-    def self.error(token : Token, message : String)
+    def error(token : Token, message : String)
       if token.type == TokenType::EOF
         report token.line, " at end", message
       else
@@ -70,12 +71,12 @@ module Crylox
       end
     end
 
-    def self.runtime_exception(exception : RuntimeException)
+    def runtime_exception(exception : RuntimeException)
       puts "\n\n#{exception.message}\n[line #{exception.token.line}]"
       @@had_runtime_exception = true
     end
 
-    def self.report(line : Int, where : String, message : String)
+    def report(line : Int, where : String, message : String)
       puts "[line #{line}] Error#{where}: #{message}"
       @@had_exception = true
     end
