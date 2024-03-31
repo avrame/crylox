@@ -11,15 +11,18 @@ module Crylox
 
     @environment = Environment.new
 
-    def interpret(statements : Array(Stmt | Nil))
+    def interpret(statements : Array(Stmt | Nil), is_repl = false)
       begin
         statements.each do |statement|
+          if is_repl && statement.is_a? Expression
+            puts stringify(evaluate(statement.expression))
+          end
           execute(statement)
         end
       rescue exception : RuntimeException
         Lox.runtime_exception(exception)
       rescue exception : Exception
-        Lox.error(1, "Statement is null")
+        Lox.error(1, "Statement is nil")
       end
     end
 

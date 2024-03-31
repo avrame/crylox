@@ -41,11 +41,11 @@ module Crylox
         if line.nil?
           break
         end
-        run line
+        run line, true
       end
     end
 
-    def run(source)
+    def run(source, is_repl = false)
       puts "\n\nRunning:\n#{source}\n\n"
       scanner = Scanner.new(source)
       tokens = scanner.scan_tokens
@@ -56,7 +56,7 @@ module Crylox
         return
       end
 
-      @@interpreter.interpret(statements)
+      @@interpreter.interpret(statements, is_repl)
     end
 
     def error(line : Int, message : String)
