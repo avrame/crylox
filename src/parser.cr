@@ -36,6 +36,11 @@ module Crylox
       if match :PRINT
         return print_statement()
       end
+
+      if match :LEFT_BRACE
+        return Block.new(block())
+      end
+
       expression_statement()
     end
 
@@ -59,6 +64,20 @@ module Crylox
       expr = expression()
       consume :SEMICOLON, "Expect ';' after expression."
       Expression.new(expr)
+    end
+
+    def block
+      statements = [] of Stmt
+
+      while !check(:RIGHT_BRACE) && !is_at_end
+        declaration = declaration()
+        if !declaration.nil?
+          statements << declaration.not_nil!
+        end
+      end
+
+      consume :RIGHT_BRACE, "Expect '}' after block."
+      statements
     end
 
     def assignment
@@ -209,7 +228,7 @@ module Crylox
     end
 
     def check(type : TokenType)
-      if is_at_end()
+      if is_at_end
         return false
       end
       return peek().type == type

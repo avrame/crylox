@@ -91,6 +91,12 @@ module Crylox
 
   STMT_TYPES = [
     {
+      class:  Block,
+      fields: [
+        {type: Array(Stmt), name: statements},
+      ],
+    },
+    {
       class:  Expression,
       fields: [
         {type: Expr, name: expression},

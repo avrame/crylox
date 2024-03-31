@@ -68,6 +68,23 @@ module Crylox
       end
     end
 
+    def visit_block_stmt(stmt : Block)
+      execute_block(stmt.statements, Environment.new(@environment))
+      return nil
+    end
+
+    def execute_block(statements : Array(Stmt), environment : Environment)
+      previous = @environment
+      begin
+        @environment = environment
+        statements.each do |statement|
+          execute(statement)
+        end
+      ensure
+        @environment = previous
+      end
+    end
+
     def visit_expression_stmt(stmt : Expression)
       evaluate(stmt.expression)
       nil
