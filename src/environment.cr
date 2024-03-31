@@ -13,7 +13,16 @@ module Crylox
         return @values[name.lexeme]
       end
 
-      raise RuntimeException.new name, "Undefined variable'#{name.lexeme}'."
+      raise RuntimeException.new name, "Undefined variable '#{name.lexeme}'."
+    end
+
+    def assign(name : Token, value : LiteralType)
+      if @values.has_key? name.lexeme
+        @values[name.lexeme] = value
+        return
+      end
+
+      raise RuntimeException.new name, "Undefined variable '#{name.lexeme}'."
     end
   end
 end

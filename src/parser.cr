@@ -17,7 +17,7 @@ module Crylox
     end
 
     def expression
-      return equality()
+      return assignment()
     end
 
     def declaration
@@ -59,6 +59,24 @@ module Crylox
       expr = expression()
       consume :SEMICOLON, "Expect ';' after expression."
       Expression.new(expr)
+    end
+
+    def assignment
+      expr = equality()
+
+      if match :EQUAL
+        equals : Token = previous()
+        value : Expr = assignment()
+
+        if expr.is_a? Variable
+          name : Token = expr.name
+          return Assign.new(name, value)
+        end
+
+        error(equals, "Invalid assignment target.")
+      end
+
+      expr
     end
 
     def equality

@@ -47,6 +47,13 @@ module Crylox
 
   EXPR_TYPES = [
     {
+      class:  Assign,
+      fields: [
+        {type: Token, name: name},
+        {type: Expr, name: value},
+      ],
+    },
+    {
       class:  Binary,
       fields: [
         {type: Expr, name: left},

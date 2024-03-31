@@ -88,6 +88,12 @@ module Crylox
       nil
     end
 
+    def visit_assign_expr(expr : Assign)
+      value = evaluate(expr.value)
+      @environment.assign(expr.name, value)
+      value
+    end
+
     def visit_binary_expr(expr : Binary)
       left = evaluate(expr.left)
       right = evaluate(expr.right)
