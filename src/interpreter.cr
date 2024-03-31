@@ -41,6 +41,10 @@ module Crylox
       nil
     end
 
+    def visit_variable_expr(expr : Variable)
+      @environment.get(expr.name)
+    end
+
     def is_truthy?(object : Object)
       case object
       when .nil?

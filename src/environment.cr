@@ -10,7 +10,7 @@ module Crylox
 
     def get(name : Token) : Object
       if @values.has_key? name.lexeme
-        return @values.get(name.lexeme)
+        return @values[name.lexeme]
       end
 
       raise RuntimeException.new name, "Undefined variable'#{name.lexeme}'."

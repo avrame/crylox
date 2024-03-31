@@ -142,6 +142,10 @@ module Crylox
         return Grouping.new(expr)
       end
 
+      if match :IDENTIFIER
+        return Variable.new(previous())
+      end
+
       raise error(peek(), "Expect Expression")
     end
 
