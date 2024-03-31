@@ -73,6 +73,10 @@ module Crylox
         {type: Expr, name: right},
       ],
     },
+    {
+      class:  Variable,
+      fields: [{type: Token, name: name}],
+    },
   ]
 
   define_visitor Expr, {{EXPR_TYPES}}
@@ -89,6 +93,13 @@ module Crylox
       class:  Print,
       fields: [
         {type: Expr, name: expression},
+      ],
+    },
+    {
+      class:  Var,
+      fields: [
+        {type: Token, name: name},
+        {type: Expr | Nil, name: initializer},
       ],
     },
   ]

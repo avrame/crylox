@@ -2,19 +2,24 @@ require "./ast"
 require "./token"
 require "./crylox"
 require "./runtime_exception"
+require "./environment"
 
 module Crylox
   class Interpreter
     include ExprVisitor(Object)
     include StmtVisitor(Nil)
 
-    def interpret(statements : Array(Stmt))
+    @environment = Environment.new
+
+    def interpret(statements : Array(Stmt | Nil))
       begin
         statements.each do |statement|
           execute(statement)
         end
       rescue exception : RuntimeException
         Lox.runtime_exception(exception)
+      rescue exception : Exception
+        Lox.error(1, "Statement is null")
       end
     end
 
@@ -53,17 +58,30 @@ module Crylox
       expr.accept(self)
     end
 
-    def execute(stmt : Stmt)
-      stmt.accept(self)
+    def execute(stmt : Stmt | Nil)
+      if !stmt.nil?
+        stmt.accept(self)
+      end
     end
 
     def visit_expression_stmt(stmt : Expression)
       evaluate(stmt.expression)
+      nil
     end
 
     def visit_print_stmt(stmt : Print)
-      value = evaluate(stmt.expression)
+      value = evaluate(stmt.expression.not_nil!)
       puts stringify(value)
+      nil
+    end
+
+    def visit_var_stmt(stmt : Var)
+      value = nil
+      if !stmt.initializer.nil?
+        value = evaluate(stmt.initializer.not_nil!)
+      end
+      @environment.define(stmt.name.lexeme, value)
+      nil
     end
 
     def visit_binary_expr(expr : Binary)

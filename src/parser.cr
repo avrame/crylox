@@ -9,15 +9,27 @@ module Crylox
     end
 
     def parse
-      statements = [] of Stmt
+      statements = [] of Stmt | Nil
       while !is_at_end
-        statements << statement()
+        statements << declaration()
       end
       statements
     end
 
     def expression
       return equality()
+    end
+
+    def declaration
+      begin
+        if match :VAR
+          return var_declaration()
+        end
+        return statement()
+      rescue exception : ParseException
+        synchronize()
+        return nil
+      end
     end
 
     def statement
@@ -31,6 +43,16 @@ module Crylox
       value = expression()
       consume :SEMICOLON, "Expect ';' after value."
       Print.new(value)
+    end
+
+    def var_declaration
+      name : Token = consume :IDENTIFIER, "Expect variable name."
+      initializer = nil
+      if match :EQUAL
+        initializer = expression()
+      end
+      consume :SEMICOLON, "Expect ';' after variable declaration."
+      Var.new(name, initializer)
     end
 
     def expression_statement
@@ -128,7 +150,7 @@ module Crylox
         return advance()
       end
 
-      error(peek(), message)
+      raise error(peek(), message)
     end
 
     def error(token : Token, message : String)
