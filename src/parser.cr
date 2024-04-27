@@ -33,8 +33,20 @@ module Crylox
     end
 
     def statement
+      if match :FOR
+        return for_statement()
+      end
+
+      if match :IF
+        return if_statement()
+      end
+
       if match :PRINT
         return print_statement()
+      end
+
+      if match :WHILE
+        return while_statement()
       end
 
       if match :LEFT_BRACE
@@ -42,6 +54,62 @@ module Crylox
       end
 
       expression_statement()
+    end
+
+    def for_statement
+      consume :LEFT_PAREN, "Expect '(' after 'for'"
+
+      initializer : Stmt | Nil
+      if match :SEMICOLON
+        initializer = nil
+      elsif match :VAR
+        initializer = var_declaration()
+      else
+        initializer = expression_statement()
+      end
+
+      condition : Expr | Nil = nil
+      if !check :SEMICOLON
+        condition = expression()
+      end
+      consume :SEMICOLON, "Expect ';' after loop condition."
+
+      increment : Expr | Nil = nil
+      if !check :SEMICOLON
+        increment = expression()
+      end
+      consume :RIGHT_PAREN, "Expect ')' after for clauses."
+
+      body = statement()
+
+      if !increment.nil?
+        body = Block.new([body, Expression.new(increment)] of Stmt)
+      end
+
+      if condition.nil?
+        condition = Literal.new(true)
+      end
+      body = While.new(condition, body)
+
+      if !initializer.nil?
+        body = Block.new([initializer, body])
+      end
+
+      body
+    end
+
+    def if_statement
+      consume :LEFT_PAREN, "Expect '(' after 'if'."
+      condition = expression()
+      consume :RIGHT_PAREN, "Expect ')' after if condition."
+
+      then_branch = statement()
+      else_branch = nil
+      if match :ELSE
+        else_branch = statement()
+      end
+
+      If.new(condition, then_branch, else_branch)
     end
 
     def print_statement
@@ -58,6 +126,14 @@ module Crylox
       end
       consume :SEMICOLON, "Expect ';' after variable declaration."
       Var.new(name, initializer)
+    end
+
+    def while_statement
+      consume :LEFT_PAREN, "Expect '(' after 'while'"
+      condition = expression()
+      consume :RIGHT_PAREN, "Expect ')' after condition."
+      body = statement()
+      While.new(condition, body)
     end
 
     def expression_statement
@@ -81,7 +157,7 @@ module Crylox
     end
 
     def assignment
-      expr = equality()
+      expr = or()
 
       if match :EQUAL
         equals : Token = previous()
@@ -93,6 +169,30 @@ module Crylox
         end
 
         error(equals, "Invalid assignment target.")
+      end
+
+      expr
+    end
+
+    def or
+      expr = and()
+
+      while match :OR
+        operator = previous()
+        right = and()
+        expr = Logical.new(expr, operator, right)
+      end
+
+      expr
+    end
+
+    def and
+      expr = equality()
+
+      while match :AND
+        operator = previous()
+        right = equality()
+        expr = Logical.new(expr, operator, right)
       end
 
       expr

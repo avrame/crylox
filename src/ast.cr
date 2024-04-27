@@ -47,14 +47,14 @@ module Crylox
 
   EXPR_TYPES = [
     {
-      class:  Assign,
+      class: Assign,
       fields: [
         {type: Token, name: name},
         {type: Expr, name: value},
       ],
     },
     {
-      class:  Binary,
+      class: Binary,
       fields: [
         {type: Expr, name: left},
         {type: Token, name: operator},
@@ -62,16 +62,24 @@ module Crylox
       ],
     },
     {
-      class:  Grouping,
+      class: Grouping,
       fields: [
         {type: Expr, name: expression},
       ],
     },
     {
-      class:  Literal,
+      class: Literal,
       fields: [
         {type: LiteralType, name: value},
       ],
+    },
+    {
+      class: Logical,
+      fields: [
+        {type: Expr, name: left},
+        {type: Token, name: operator},
+        {type: Expr, name: right},
+      ]
     },
     {
       class:  Unary,
@@ -81,7 +89,7 @@ module Crylox
       ],
     },
     {
-      class:  Variable,
+      class: Variable,
       fields: [{type: Token, name: name}],
     },
   ]
@@ -91,30 +99,45 @@ module Crylox
 
   STMT_TYPES = [
     {
-      class:  Block,
+      class: Block,
       fields: [
         {type: Array(Stmt), name: statements},
       ],
     },
     {
-      class:  Expression,
+      class: Expression,
       fields: [
         {type: Expr, name: expression},
       ],
     },
     {
-      class:  Print,
+      class: If,
+      fields: [
+        {type: Expr, name: condition},
+        {type: Stmt, name: then_branch},
+        {type: Stmt | Nil, name: else_branch},
+      ]
+    },
+    {
+      class: Print,
       fields: [
         {type: Expr, name: expression},
       ],
     },
     {
-      class:  Var,
+      class: Var,
       fields: [
         {type: Token, name: name},
         {type: Expr | Nil, name: initializer},
       ],
     },
+    {
+      class: While,
+      fields: [
+        {type: Expr, name: condition},
+        {type: Stmt, name: body},
+      ]
+    }
   ]
 
   define_visitor Stmt, {{STMT_TYPES}}

@@ -30,6 +30,22 @@ module Crylox
       expr.value
     end
 
+    def visit_logical_expr(expr : Logical)
+      left = evaluate(expr.left)
+
+      if expr.operator.type == TokenType::OR
+        if is_truthy?(left)
+          return left
+        end
+      else
+        if !is_truthy?(left)
+          return left
+        end
+      end
+
+      evaluate(expr.right)
+    end
+
     def visit_unary_expr(expr : Unary)
       right = evaluate(expr.right)
 
@@ -53,7 +69,7 @@ module Crylox
       when .nil?
         return false
       when .is_a?(Bool)
-        return Object
+        return object
       end
     end
 
@@ -93,6 +109,15 @@ module Crylox
       nil
     end
 
+    def visit_if_stmt(stmt : If)
+      if is_truthy?(evaluate(stmt.condition))
+        execute(stmt.then_branch)
+      elsif !stmt.else_branch.nil?
+        execute(stmt.else_branch)
+      end
+      nil
+    end
+
     def visit_print_stmt(stmt : Print)
       value = evaluate(stmt.expression.not_nil!)
       puts stringify(value)
@@ -105,6 +130,13 @@ module Crylox
         value = evaluate(stmt.initializer.not_nil!)
       end
       @environment.define(stmt.name.lexeme, value)
+      nil
+    end
+
+    def visit_while_stmt(stmt : While)
+      while is_truthy? evaluate(stmt.condition)
+        execute(stmt.body)
+      end
       nil
     end
 

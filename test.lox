@@ -17,3 +17,23 @@ var c = "global c";
 print a;
 print b;
 print c;
+
+if (2 == 2 and 1 == 2 or 3 == 3) {
+  print "hello!";
+} else {
+  print "bye!";
+}
+
+// var i = 1;
+// while (i <= 10) {
+//   print i;
+//   i = i + 1;
+// }
+
+var a = 0;
+var temp;
+for (var b = 1; a < 10000; b = temp + b) {
+  print a;
+  temp = a;
+  a = b;
+}
