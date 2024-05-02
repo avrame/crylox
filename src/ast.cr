@@ -51,7 +51,7 @@ module Crylox
       fields: [
         {type: Token, name: name},
         {type: Expr, name: value},
-      ],
+      ]
     },
     {
       class: Binary,
@@ -59,19 +59,27 @@ module Crylox
         {type: Expr, name: left},
         {type: Token, name: operator},
         {type: Expr, name: right},
-      ],
+      ]
+    },
+    {
+      class: Call,
+      fields: [
+        {type: Expr, name: callee},
+        {type: Token, name: paren},
+        {type: Array(Expr), name: arguments},
+      ]
     },
     {
       class: Grouping,
       fields: [
         {type: Expr, name: expression},
-      ],
+      ]
     },
     {
       class: Literal,
       fields: [
         {type: LiteralType, name: value},
-      ],
+      ]
     },
     {
       class: Logical,
@@ -86,7 +94,7 @@ module Crylox
       fields: [
         {type: Token, name: operator},
         {type: Expr, name: right},
-      ],
+      ]
     },
     {
       class: Variable,
@@ -102,13 +110,21 @@ module Crylox
       class: Block,
       fields: [
         {type: Array(Stmt), name: statements},
-      ],
+      ]
     },
     {
       class: Expression,
       fields: [
         {type: Expr, name: expression},
-      ],
+      ]
+    },
+    {
+      class: Function,
+      fields: [
+        {type: Token, name: name},
+        {type: Array(Token), name: params},
+        {type: Array(Stmt), name: body},
+      ]
     },
     {
       class: If,
@@ -122,14 +138,21 @@ module Crylox
       class: Print,
       fields: [
         {type: Expr, name: expression},
-      ],
+      ]
+    },
+    {
+      class: Return,
+      fields: [
+        {type: Token, name: keyword},
+        {type: Expr | Nil, name: value},
+      ]
     },
     {
       class: Var,
       fields: [
         {type: Token, name: name},
         {type: Expr | Nil, name: initializer},
-      ],
+      ]
     },
     {
       class: While,

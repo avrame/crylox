@@ -3,13 +3,21 @@ require "./token"
 require "./crylox"
 require "./runtime_exception"
 require "./environment"
+require "./lox_callable"
+require "./lox_function"
+require "./clock"
 
 module Crylox
   class Interpreter
     include ExprVisitor(Object)
     include StmtVisitor(Nil)
 
-    @environment = Environment.new
+    getter globals : Environment = Environment.new
+
+    def initialize
+      @environment = @globals
+      @globals.define("clock", Clock.new())
+    end
 
     def interpret(statements : Array(Stmt | Nil), is_repl = false)
       begin
@@ -89,7 +97,7 @@ module Crylox
 
     def visit_block_stmt(stmt : Block)
       execute_block(stmt.statements, Environment.new(@environment))
-      return nil
+      nil
     end
 
     def execute_block(statements : Array(Stmt), environment : Environment)
@@ -109,6 +117,12 @@ module Crylox
       nil
     end
 
+    def visit_function_stmt(stmt : Function)
+      function = LoxFunction.new(stmt)
+      @environment.define(stmt.name.lexeme, function)
+      nil
+    end
+
     def visit_if_stmt(stmt : If)
       if is_truthy?(evaluate(stmt.condition))
         execute(stmt.then_branch)
@@ -122,6 +136,14 @@ module Crylox
       value = evaluate(stmt.expression.not_nil!)
       puts stringify(value)
       nil
+    end
+
+    def visit_return_stmt(stmt : Return)
+      value = nil
+      if !stmt.value.nil?
+        value = evaluate(stmt.value.not_nil!)
+      end
+      raise ReturnException.new(value)
     end
 
     def visit_var_stmt(stmt : Var)
@@ -198,6 +220,25 @@ module Crylox
       nil
     end
 
+    def visit_call_expr(expr : Call)
+      callee = evaluate(expr.callee)
+
+      arguments = [] of LiteralType
+      expr.arguments.each do |argument|
+        arguments << evaluate(argument)
+      end
+
+      if !callee.is_a? LoxCallable
+        raise RuntimeException.new expr.paren, "Can only call functions and classes."
+      end
+
+      function = callee.as(LoxCallable)
+      if arguments.size != function.arity()
+        raise RuntimeException.new expr.paren, "Expected #{function.arity()} arguments but got #{arguments.size}."
+      end
+      function.call(self, arguments)
+    end
+
     def is_equal(a : Object, b : Object)
       if a.nil? && b.nil?
         return true
@@ -237,6 +278,13 @@ module Crylox
       end
 
       return object.to_s
+    end
+  end
+
+  class ReturnException < Exception
+    getter value : LiteralType
+
+    def initialize(@value : LiteralType)
     end
   end
 end

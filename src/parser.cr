@@ -22,6 +22,9 @@ module Crylox
 
     def declaration
       begin
+        if match :FUN
+          return function("function")
+        end
         if match :VAR
           return var_declaration()
         end
@@ -43,6 +46,10 @@ module Crylox
 
       if match :PRINT
         return print_statement()
+      end
+
+      if match :RETURN
+        return return_statement()
       end
 
       if match :WHILE
@@ -118,6 +125,16 @@ module Crylox
       Print.new(value)
     end
 
+    def return_statement
+      keyword = previous()
+      value = nil
+      if !check :SEMICOLON
+        value = expression()
+      end
+      consume :SEMICOLON, "Expect ';' after return value."
+      Return.new(keyword, value)
+    end
+
     def var_declaration
       name : Token = consume :IDENTIFIER, "Expect variable name."
       initializer = nil
@@ -140,6 +157,25 @@ module Crylox
       expr = expression()
       consume :SEMICOLON, "Expect ';' after expression."
       Expression.new(expr)
+    end
+
+    def function(kind : String)
+      name = consume :IDENTIFIER, "Expect #{kind} name."
+      consume :LEFT_PAREN, "Expect '(' after #{kind} name."
+      parameters = [] of Token
+      if !check :RIGHT_PAREN
+        loop do
+          if parameters.size >= 255
+            error(peek(), "Can't have more than 255 parameters.")
+          end
+          parameters << consume :IDENTIFIER, "Expect parameter name."
+          break unless match :COMMA
+        end
+      end
+      consume :RIGHT_PAREN, "Expect ')' after parameters."
+      consume :LEFT_BRACE, "Expect '{' before #{kind} body."
+      body = block()
+      Function.new(name, parameters, body)
     end
 
     def block
@@ -253,7 +289,36 @@ module Crylox
         return Unary.new(operator, right)
       end
 
-      primary()
+      call()
+    end
+
+    def call
+      expr = primary()
+      loop do
+        if match :LEFT_PAREN
+          expr = finish_call(expr)
+        else
+          break
+        end
+      end
+      expr
+    end
+
+    def finish_call(callee : Expr)
+      arguments = [] of Expr
+
+      if !check :RIGHT_PAREN
+        loop do
+          if arguments.size >= 255
+            error peek(), "Can't have more than 255 arguments."
+          end
+          arguments << expression()
+          break if !match :COMMA
+        end
+      end
+
+      paren = consume :RIGHT_PAREN, "Expect ')' after arguments."
+      Call.new(callee, paren, arguments)
     end
 
     def primary : Expr
@@ -283,7 +348,7 @@ module Crylox
         return Variable.new(previous())
       end
 
-      raise error(peek(), "Expect Expression")
+      raise error peek(), "Expect Expression"
     end
 
     def consume(type : TokenType, message : String)
@@ -291,11 +356,11 @@ module Crylox
         return advance()
       end
 
-      raise error(peek(), message)
+      raise error peek(), message
     end
 
     def error(token : Token, message : String)
-      Lox.error(token, message)
+      Lox.error token, message
       return ParseException.new
     end
 
