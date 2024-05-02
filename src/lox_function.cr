@@ -3,13 +3,11 @@ require "./ast"
 
 module Crylox
   class LoxFunction < LoxCallable
-    @declaration : Function
-
-    def initialize(@declaration : Function)
+    def initialize(@declaration : Function, @closure : Environment)
     end
 
     def call(interpreter : Interpreter, arguments : Array(LiteralType)) : LiteralType
-      environment = Environment.new(interpreter.globals)
+      environment = Environment.new(@closure)
       @declaration.params.each_with_index do |param, idx|
         environment.define(param.lexeme, arguments[idx])
       end

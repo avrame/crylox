@@ -16,7 +16,7 @@ module Crylox
 
     def initialize
       @environment = @globals
-      @globals.define("clock", Clock.new())
+      @globals.define("clock", Clock.new)
     end
 
     def interpret(statements : Array(Stmt | Nil), is_repl = false)
@@ -118,7 +118,7 @@ module Crylox
     end
 
     def visit_function_stmt(stmt : Function)
-      function = LoxFunction.new(stmt)
+      function = LoxFunction.new(stmt, @environment)
       @environment.define(stmt.name.lexeme, function)
       nil
     end
@@ -233,8 +233,8 @@ module Crylox
       end
 
       function = callee.as(LoxCallable)
-      if arguments.size != function.arity()
-        raise RuntimeException.new expr.paren, "Expected #{function.arity()} arguments but got #{arguments.size}."
+      if arguments.size != function.arity
+        raise RuntimeException.new expr.paren, "Expected #{function.arity} arguments but got #{arguments.size}."
       end
       function.call(self, arguments)
     end
