@@ -47,57 +47,57 @@ module Crylox
 
   EXPR_TYPES = [
     {
-      class: Assign,
+      class:  Assign,
       fields: [
         {type: Token, name: name},
         {type: Expr, name: value},
-      ]
+      ],
     },
     {
-      class: Binary,
+      class:  Binary,
       fields: [
         {type: Expr, name: left},
         {type: Token, name: operator},
         {type: Expr, name: right},
-      ]
+      ],
     },
     {
-      class: Call,
+      class:  Call,
       fields: [
         {type: Expr, name: callee},
         {type: Token, name: paren},
         {type: Array(Expr), name: arguments},
-      ]
+      ],
     },
     {
-      class: Grouping,
+      class:  Grouping,
       fields: [
         {type: Expr, name: expression},
-      ]
+      ],
     },
     {
-      class: Literal,
+      class:  Literal,
       fields: [
         {type: LiteralType, name: value},
-      ]
+      ],
     },
     {
-      class: Logical,
+      class:  Logical,
       fields: [
         {type: Expr, name: left},
         {type: Token, name: operator},
         {type: Expr, name: right},
-      ]
+      ],
     },
     {
       class:  Unary,
       fields: [
         {type: Token, name: operator},
         {type: Expr, name: right},
-      ]
+      ],
     },
     {
-      class: Variable,
+      class:  Variable,
       fields: [{type: Token, name: name}],
     },
   ]
@@ -107,60 +107,64 @@ module Crylox
 
   STMT_TYPES = [
     {
-      class: Block,
+      class:  Block,
       fields: [
         {type: Array(Stmt), name: statements},
-      ]
+      ],
     },
     {
-      class: Expression,
+      class:  Expression,
       fields: [
         {type: Expr, name: expression},
-      ]
+      ],
     },
     {
-      class: Function,
+      class:  Function,
       fields: [
         {type: Token, name: name},
         {type: Array(Token), name: params},
         {type: Array(Stmt), name: body},
-      ]
+      ],
     },
     {
-      class: If,
+      class:  If,
       fields: [
         {type: Expr, name: condition},
         {type: Stmt, name: then_branch},
         {type: Stmt | Nil, name: else_branch},
-      ]
+      ],
     },
     {
-      class: Print,
+      class:  Print,
       fields: [
         {type: Expr, name: expression},
-      ]
+      ],
     },
     {
-      class: Return,
+      class:  Return,
       fields: [
         {type: Token, name: keyword},
         {type: Expr | Nil, name: value},
-      ]
+      ],
     },
     {
-      class: Var,
+      class:  Var,
       fields: [
         {type: Token, name: name},
         {type: Expr | Nil, name: initializer},
-      ]
+      ],
     },
     {
-      class: While,
+      class:  While,
       fields: [
         {type: Expr, name: condition},
         {type: Stmt, name: body},
-      ]
-    }
+      ],
+    },
+    {
+      class:  Break,
+      fields: [] of Object,
+    },
   ]
 
   define_visitor Stmt, {{STMT_TYPES}}

@@ -20,6 +20,7 @@ module Crylox
       "true"   => TokenType::TRUE,
       "var"    => TokenType::VAR,
       "while"  => TokenType::WHILE,
+      "break"  => TokenType::BREAK,
     }
     @tokens = [] of Token
     @start : Int64 = 0

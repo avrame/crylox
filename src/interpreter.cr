@@ -157,9 +157,17 @@ module Crylox
 
     def visit_while_stmt(stmt : While)
       while is_truthy? evaluate(stmt.condition)
-        execute(stmt.body)
+        begin
+          execute(stmt.body)
+        rescue break_exception : BreakException
+          break
+        end
       end
       nil
+    end
+
+    def visit_break_stmt(stmt : Break)
+      raise BreakException.new
     end
 
     def visit_assign_expr(expr : Assign)
@@ -286,5 +294,8 @@ module Crylox
 
     def initialize(@value : LiteralType)
     end
+  end
+
+  class BreakException < Exception
   end
 end

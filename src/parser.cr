@@ -56,6 +56,10 @@ module Crylox
         return while_statement()
       end
 
+      if match :BREAK
+        return break_statement()
+      end
+
       if match :LEFT_BRACE
         return Block.new(block())
       end
@@ -151,6 +155,11 @@ module Crylox
       consume :RIGHT_PAREN, "Expect ')' after condition."
       body = statement()
       While.new(condition, body)
+    end
+
+    def break_statement
+      consume :SEMICOLON, "Expect ';' after break statement."
+      Break.new
     end
 
     def expression_statement
