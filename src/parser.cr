@@ -171,6 +171,23 @@ module Crylox
     def function(kind : String)
       name = consume :IDENTIFIER, "Expect #{kind} name."
       consume :LEFT_PAREN, "Expect '(' after #{kind} name."
+      parameters = parse_parameters()
+      consume :RIGHT_PAREN, "Expect ')' after parameters."
+      consume :LEFT_BRACE, "Expect '{' before #{kind} body."
+      body = block()
+      Function.new(name, parameters, body)
+    end
+
+    def lambda
+      consume :LEFT_PAREN, "Expect '(' after fn."
+      parameters = parse_parameters()
+      consume :RIGHT_PAREN, "Expect ')' after parameters."
+      consume :LEFT_BRACE, "Expect '{' before fn body."
+      body = block()
+      Lambda.new(parameters, body)
+    end
+
+    def parse_parameters
       parameters = [] of Token
       if !check :RIGHT_PAREN
         loop do
@@ -181,10 +198,7 @@ module Crylox
           break unless match :COMMA
         end
       end
-      consume :RIGHT_PAREN, "Expect ')' after parameters."
-      consume :LEFT_BRACE, "Expect '{' before #{kind} body."
-      body = block()
-      Function.new(name, parameters, body)
+      parameters
     end
 
     def block
@@ -355,6 +369,10 @@ module Crylox
 
       if match :IDENTIFIER
         return Variable.new(previous())
+      end
+
+      if match :FUN
+        return lambda()
       end
 
       raise error peek(), "Expect Expression"

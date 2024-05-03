@@ -1,3 +1,4 @@
+print "Test scope START";
 var a = "global a";
 var b = "global b";
 var c = "global c";
@@ -17,13 +18,10 @@ var c = "global c";
 print a;
 print b;
 print c;
+print "Test scope END";
+print "";
 
-if (2 == 2 and 1 == 2 or 3 == 3) {
-  print "hello!";
-} else {
-  print "bye!";
-}
-
+print "Test recursion START";
 fun fib(n) {
   if (n <= 1) return n;
   return fib(n - 2) + fib(n - 1);
@@ -32,7 +30,10 @@ fun fib(n) {
 for (var i = 0; i < 20; i = i + 1) {
   print fib(i);
 }
+print "Test recursion END";
+print "";
 
+print "Test closure START";
 fun makeCounter() {
   var i = 0;
   fun count() {
@@ -46,10 +47,27 @@ fun makeCounter() {
 var counter = makeCounter();
 counter(); // "1".
 counter(); // "2".
+print "Test closure END";
+print "";
 
+print "Test break START";
 var i = 0;
 while(true) {
   if (i == 10) break;
   print i;
   i = i + 1;
 }
+print "Test break END";
+print "";
+
+print "Test lambda START";
+fun thrice(fn) {
+  for (var i = 1; i <= 3; i = i + 1) {
+    fn(i);
+  }
+}
+
+thrice(fun (a) {
+  print a;
+});
+print "Test lambda END";

@@ -100,6 +100,13 @@ module Crylox
       class:  Variable,
       fields: [{type: Token, name: name}],
     },
+    {
+      class:  Lambda,
+      fields: [
+        {type: Array(Token), name: params},
+        {type: Array(Stmt), name: body},
+      ],
+    },
   ]
 
   define_visitor Expr, {{EXPR_TYPES}}

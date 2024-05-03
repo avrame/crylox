@@ -3,6 +3,8 @@ require "./ast"
 
 module Crylox
   class LoxFunction < LoxCallable
+    @declaration : Function | Lambda
+
     def initialize(@declaration : Function, @closure : Environment)
     end
 

@@ -5,6 +5,7 @@ require "./runtime_exception"
 require "./environment"
 require "./lox_callable"
 require "./lox_function"
+require "./lambda_function"
 require "./clock"
 
 module Crylox
@@ -226,6 +227,10 @@ module Crylox
       end
 
       nil
+    end
+
+    def visit_lambda_expr(expr : Lambda)
+      LambdaFunction.new(expr, @environment)
     end
 
     def visit_call_expr(expr : Call)
