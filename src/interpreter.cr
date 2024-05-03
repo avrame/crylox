@@ -10,10 +10,8 @@ require "./clock"
 
 module Crylox
   class Interpreter
-    include ExprVisitor(Object)
-    include StmtVisitor(Nil)
-
     getter globals : Environment = Environment.new
+    @locals = Hash(Expr, Int32).new
 
     def initialize
       @environment = @globals
@@ -30,7 +28,7 @@ module Crylox
         end
       rescue exception : RuntimeException
         Lox.runtime_exception(exception)
-      rescue exception : Exception
+      rescue exception : NilException
         Lox.error(1, "Statement is nil")
       end
     end
@@ -70,7 +68,16 @@ module Crylox
     end
 
     def visit_variable_expr(expr : Variable)
-      @environment.get(expr.name)
+      look_up_variable(expr.name, expr)
+    end
+
+    def look_up_variable(name : Token, expr : Expr)
+      distance = @locals[expr]?
+      if !distance.nil?
+        return @environment.get_at(distance, name.lexeme)
+      else
+        return globals.get(name)
+      end
     end
 
     def is_truthy?(object : Object)
@@ -93,7 +100,13 @@ module Crylox
     def execute(stmt : Stmt | Nil)
       if !stmt.nil?
         stmt.accept(self)
+      else
+        raise NilException.new
       end
+    end
+
+    def resolve(expr : Expr, depth : Int)
+      @locals[expr] = depth
     end
 
     def visit_block_stmt(stmt : Block)
@@ -173,7 +186,14 @@ module Crylox
 
     def visit_assign_expr(expr : Assign)
       value = evaluate(expr.value)
-      @environment.assign(expr.name, value)
+
+      distance = @locals[expr]?
+      if !distance.nil?
+        @environment.assign_at(distance, expr.name, value)
+      else
+        @globals.assign(expr.name, value)
+      end
+
       value
     end
 
@@ -302,5 +322,8 @@ module Crylox
   end
 
   class BreakException < Exception
+  end
+
+  class NilException < Exception
   end
 end

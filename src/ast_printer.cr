@@ -3,9 +3,6 @@ require "./token"
 
 module Crylox
   class AstPrinter
-    include ExprVisitor(String)
-    include StmtVisitor(Nil)
-
     def print(expr : Expr)
       expr.accept(self)
     end

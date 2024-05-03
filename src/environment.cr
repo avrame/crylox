@@ -2,8 +2,8 @@ require "./token"
 
 module Crylox
   class Environment
-    @enclosing : Environment | Nil
-    @values = Hash(String, LiteralType).new
+    getter enclosing : Environment | Nil
+    getter values = Hash(String, LiteralType).new
 
     def initialize
       @enclosing = nil
@@ -15,6 +15,28 @@ module Crylox
 
     def define(name : String, value : LiteralType)
       @values[name] = value
+    end
+
+    def ancestor(distance : Int32)
+      environment = self
+      i = 0
+      while i < distance
+        if environment.nil?
+          raise Exception.new
+        else
+          environment = environment.enclosing
+        end
+        i += 1
+      end
+      environment
+    end
+
+    def get_at(distance : Int32, name : String)
+      ancestor(distance).not_nil!.values[name]
+    end
+
+    def assign_at(distance : Int32, name : Token, value : LiteralType)
+      ancestor(distance).not_nil!.values[name.lexeme] = value
     end
 
     def get(name : Token) : Object

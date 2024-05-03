@@ -158,8 +158,9 @@ module Crylox
     end
 
     def break_statement
+      keyword = previous()
       consume :SEMICOLON, "Expect ';' after break statement."
-      Break.new
+      Break.new(keyword)
     end
 
     def expression_statement

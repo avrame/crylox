@@ -1,15 +1,6 @@
 require "./token"
 
 module Crylox
-  macro define_visitor(base_name, types)
-    module {{base_name}}Visitor(T)
-      {% for type in types %}
-        def visit_{{ type[:class].id.downcase }}_{{ base_name.id.downcase }}(expr : {{ type[:class].id }}) : T
-        end
-      {% end %}
-    end
-  end
-
   macro define_ast(base_name, types)
     abstract class {{ base_name.id }}
     end
@@ -109,7 +100,6 @@ module Crylox
     },
   ]
 
-  define_visitor Expr, {{EXPR_TYPES}}
   define_ast Expr, {{EXPR_TYPES}}
 
   STMT_TYPES = [
@@ -170,10 +160,11 @@ module Crylox
     },
     {
       class:  Break,
-      fields: [] of Object,
+      fields: [
+        {type: Token, name: keyword},
+      ],
     },
   ]
 
-  define_visitor Stmt, {{STMT_TYPES}}
   define_ast Stmt, {{STMT_TYPES}}
 end

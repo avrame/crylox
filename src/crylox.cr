@@ -4,6 +4,7 @@ require "./ast"
 require "./ast_printer"
 require "./runtime_exception"
 require "./interpreter"
+require "./resolver"
 
 module Crylox
   if ARGV.size > 1
@@ -46,12 +47,21 @@ module Crylox
     end
 
     def run(source, is_repl = false)
-      puts "\n\nRunning:\n#{source}\n\n"
+      # puts "\n\nRunning:\n#{source}\n\n"
       scanner = Scanner.new(source)
       tokens = scanner.scan_tokens
       parser = Parser.new(tokens)
       statements = parser.parse
 
+      # Stop if there's a parse error
+      if @@had_exception
+        return
+      end
+
+      resolver = Resolver.new(@@interpreter)
+      resolver.resolve(statements)
+
+      # Stop if there's a resolver error
       if @@had_exception
         return
       end
