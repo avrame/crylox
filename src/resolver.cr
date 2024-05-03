@@ -125,8 +125,7 @@ module Crylox
     end
 
     def visit_variable_expr(expr : Variable)
-      var_name = expr.name.lexeme
-      if !@scopes.empty? && @scopes[-1].has_key?(var_name) && @scopes[-1][var_name] == false
+      if !@scopes.empty? && @scopes[-1][expr.name.lexeme]? == false
         Lox.error(expr.name, "Can't read local variable in its own initializer.")
       end
 
