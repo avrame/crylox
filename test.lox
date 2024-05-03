@@ -57,6 +57,7 @@ while(true) {
   print i;
   i = i + 1;
 }
+// break; // prints "[line 60] Error at 'break': Can't break outside of a loop."
 print "Test break END";
 print "";
 
