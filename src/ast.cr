@@ -61,6 +61,13 @@ module Crylox
       ],
     },
     {
+      class:  Get,
+      fields: [
+        {type: Expr, name: object},
+        {type: Token, name: name},
+      ],
+    },
+    {
       class:  Grouping,
       fields: [
         {type: Expr, name: expression},
@@ -78,6 +85,14 @@ module Crylox
         {type: Expr, name: left},
         {type: Token, name: operator},
         {type: Expr, name: right},
+      ],
+    },
+    {
+      class:  Set,
+      fields: [
+        {type: Expr, name: object},
+        {type: Token, name: name},
+        {type: Expr, name: value},
       ],
     },
     {
@@ -107,6 +122,13 @@ module Crylox
       class:  Block,
       fields: [
         {type: Array(Stmt), name: statements},
+      ],
+    },
+    {
+      class:  Class,
+      fields: [
+        {type: Token, name: name},
+        {type: Array(Function), name: methods},
       ],
     },
     {

@@ -22,6 +22,9 @@ module Crylox
 
     def declaration
       begin
+        if match :CLASS
+          return class_declaration()
+        end
         if match :FUN
           return function("function")
         end
@@ -33,6 +36,19 @@ module Crylox
         synchronize()
         return nil
       end
+    end
+
+    def class_declaration
+      name = consume :IDENTIFIER, "Expect class name."
+      consume :LEFT_BRACE, "Expect '{' before class body."
+
+      methods = [] of Function
+      while !check(:RIGHT_BRACE) && !is_at_end
+        methods << function("method")
+      end
+
+      consume :RIGHT_BRACE, "Expect '}' after class body."
+      return Class.new(name, methods)
     end
 
     def statement
@@ -226,6 +242,8 @@ module Crylox
         if expr.is_a? Variable
           name : Token = expr.name
           return Assign.new(name, value)
+        elsif expr.is_a? Get
+          return Set.new(expr.object, expr.name, value)
         end
 
         error(equals, "Invalid assignment target.")
@@ -321,6 +339,9 @@ module Crylox
       loop do
         if match :LEFT_PAREN
           expr = finish_call(expr)
+        elsif match :DOT
+          name = consume :IDENTIFIER, "Expect property name after '.'."
+          expr = Get.new(expr, name)
         else
           break
         end

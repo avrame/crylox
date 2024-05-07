@@ -20,6 +20,18 @@ module Crylox
       nil
     end
 
+    def visit_class_stmt(stmt : Class)
+      declare(stmt.name)
+      define(stmt.name)
+
+      stmt.methods.each do |method|
+        declaration = FunctionType::METHOD
+        resolve_function(method, declaration)
+      end
+
+      nil
+    end
+
     def visit_expression_stmt(stmt : Expression)
       resolve(stmt.expression)
       nil
@@ -104,6 +116,11 @@ module Crylox
       nil
     end
 
+    def visit_get_expr(expr : Get)
+      resolve(expr.object)
+      nil
+    end
+
     def visit_grouping_expr(expr : Grouping)
       resolve(expr.expression)
       nil
@@ -116,6 +133,12 @@ module Crylox
     def visit_logical_expr(expr : Logical)
       resolve(expr.left)
       resolve(expr.right)
+      nil
+    end
+
+    def visit_set_expr(expr : Set)
+      resolve(expr.value)
+      resolve(expr.object)
       nil
     end
 
@@ -195,5 +218,6 @@ module Crylox
   enum FunctionType
     NONE
     FUNCTION
+    METHOD
   end
 end

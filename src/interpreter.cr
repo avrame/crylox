@@ -5,6 +5,7 @@ require "./runtime_exception"
 require "./environment"
 require "./lox_callable"
 require "./lox_function"
+require "./lox_class"
 require "./lambda_function"
 require "./clock"
 
@@ -51,6 +52,18 @@ module Crylox
       end
 
       evaluate(expr.right)
+    end
+
+    def visit_set_expr(expr : Expr)
+      object = evaluate(expr.object)
+
+      if !object.is_a? LoxInstance
+        raise RuntimeException.new expr.name, "Only instances have fields."
+      end
+
+      value = evaluate(expr.value)
+      object.set(expr.name, value)
+      value
     end
 
     def visit_unary_expr(expr : Unary)
@@ -111,6 +124,20 @@ module Crylox
 
     def visit_block_stmt(stmt : Block)
       execute_block(stmt.statements, Environment.new(@environment))
+      nil
+    end
+
+    def visit_class_stmt(stmt : Class)
+      @environment.define(stmt.name.lexeme, nil)
+
+      methods = Hash(String, LoxFunction).new
+      stmt.methods.each do |method|
+        function = LoxFunction.new(method, @environment)
+        methods[method.name.lexeme] = function
+      end
+
+      klass = LoxClass.new(stmt.name.lexeme, methods)
+      @environment.assign(stmt.name, klass)
       nil
     end
 
@@ -270,6 +297,14 @@ module Crylox
         raise RuntimeException.new expr.paren, "Expected #{function.arity} arguments but got #{arguments.size}."
       end
       function.call(self, arguments)
+    end
+
+    def visit_get_expr(expr : Get)
+      object = evaluate(expr.object)
+      if object.is_a? LoxInstance
+        return object.get(expr.name)
+      end
+      raise RuntimeException.new expr.name, "Only instances have properties."
     end
 
     def is_equal(a : Object, b : Object)

@@ -72,3 +72,14 @@ thrice(fun (a) {
   print a;
 });
 print "Test lambda END";
+
+print "Test Class Start";
+class Dog {
+  speak(foo) {
+    print "Bark! " + foo;
+  }
+}
+var dog = Dog();
+dog.speak("Woof!");
+dog.speak("Grrr!");
+print "Test Class End";
