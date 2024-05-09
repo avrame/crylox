@@ -96,6 +96,10 @@ module Crylox
       ],
     },
     {
+      class: This,
+      fields: [{type: Token, name: keyword}],
+    },
+    {
       class:  Unary,
       fields: [
         {type: Token, name: operator},

@@ -1,7 +1,19 @@
 module Crylox
+  enum FunctionType
+    NONE
+    FUNCTION
+    METHOD
+  end
+
+  enum ClassType
+    NONE
+    CLASS
+  end
+
   class Resolver
     @scopes = [] of Hash(String, Bool)
     @current_function = FunctionType::NONE
+    @current_class = ClassType::NONE
     @in_while = false
 
     def initialize(@interpreter : Interpreter)
@@ -21,14 +33,23 @@ module Crylox
     end
 
     def visit_class_stmt(stmt : Class)
+      enclosing_class = @current_class
+      @current_class = ClassType::CLASS
+
       declare(stmt.name)
       define(stmt.name)
+
+      begin_scope()
+      @scopes[-1]["this"] = true
 
       stmt.methods.each do |method|
         declaration = FunctionType::METHOD
         resolve_function(method, declaration)
       end
 
+      end_scope()
+
+      @current_class = enclosing_class
       nil
     end
 
@@ -142,6 +163,15 @@ module Crylox
       nil
     end
 
+    def visit_this_expr(expr : This)
+      if @current_class == ClassType::NONE
+        Lox.error expr.keyword, "Can't use 'this' outside of a class."
+        return nil
+      end
+      resolve_local(expr, expr.keyword)
+      nil
+    end
+
     def visit_unary_expr(expr : Unary)
       resolve(expr.right)
       nil
@@ -213,11 +243,5 @@ module Crylox
         end
       end
     end
-  end
-
-  enum FunctionType
-    NONE
-    FUNCTION
-    METHOD
   end
 end

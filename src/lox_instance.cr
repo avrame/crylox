@@ -12,7 +12,7 @@ module Crylox
 
       method = @klass.find_method(name.lexeme)
       if !method.nil?
-        return method
+        return method.bind(self)
       end
 
       raise RuntimeException.new name, "Undefined property '#{name.lexeme}'."

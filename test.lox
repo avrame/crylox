@@ -72,14 +72,21 @@ thrice(fun (a) {
   print a;
 });
 print "Test lambda END";
+print "";
 
 print "Test Class Start";
 class Dog {
+  init(name) {
+    this.name = name;
+  }
+
   speak(foo) {
     print "Bark! " + foo;
+    print "My name is " + this.name + "!";
   }
 }
-var dog = Dog();
+var dog = Dog("Blaze");
 dog.speak("Woof!");
 dog.speak("Grrr!");
 print "Test Class End";
+print "";

@@ -66,6 +66,10 @@ module Crylox
       value
     end
 
+    def visit_this_expr(expr : This)
+      look_up_variable(expr.keyword, expr)
+    end
+
     def visit_unary_expr(expr : Unary)
       right = evaluate(expr.right)
 
@@ -132,7 +136,7 @@ module Crylox
 
       methods = Hash(String, LoxFunction).new
       stmt.methods.each do |method|
-        function = LoxFunction.new(method, @environment)
+        function = LoxFunction.new(method, @environment, method.name == "init")
         methods[method.name.lexeme] = function
       end
 
@@ -159,7 +163,7 @@ module Crylox
     end
 
     def visit_function_stmt(stmt : Function)
-      function = LoxFunction.new(stmt, @environment)
+      function = LoxFunction.new(stmt, @environment, false)
       @environment.define(stmt.name.lexeme, function)
       nil
     end
@@ -277,7 +281,7 @@ module Crylox
     end
 
     def visit_lambda_expr(expr : Lambda)
-      LambdaFunction.new(expr, @environment)
+      LambdaFunction.new(expr, @environment, false)
     end
 
     def visit_call_expr(expr : Call)

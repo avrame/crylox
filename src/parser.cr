@@ -389,6 +389,10 @@ module Crylox
         return Grouping.new(expr)
       end
 
+      if match :THIS
+        return This.new(previous())
+      end
+
       if match :IDENTIFIER
         return Variable.new(previous())
       end
