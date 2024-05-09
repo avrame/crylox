@@ -22,6 +22,9 @@ module Crylox
       begin
         interpreter.execute_block(@declaration.body, environment)
       rescue return_exception : ReturnException
+        if @is_initializer
+          return @closure.get_at(0, "this")
+        end
         return return_exception.value
       end
 

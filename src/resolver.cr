@@ -2,6 +2,7 @@ module Crylox
   enum FunctionType
     NONE
     FUNCTION
+    INITIALIZER
     METHOD
   end
 
@@ -43,7 +44,11 @@ module Crylox
       @scopes[-1]["this"] = true
 
       stmt.methods.each do |method|
-        declaration = FunctionType::METHOD
+        if method.name.lexeme == "init"
+          declaration = FunctionType::INITIALIZER
+        else
+          declaration = FunctionType::METHOD
+        end
         resolve_function(method, declaration)
       end
 
@@ -81,9 +86,12 @@ module Crylox
 
     def visit_return_stmt(stmt : Return)
       if @current_function == FunctionType::NONE
-        Lox.error(stmt.keyword, "Can't return from top-level code.")
+        Lox.error stmt.keyword, "Can't return from top-level code."
       end
       if !stmt.value.nil?
+        if @current_function == FunctionType::INITIALIZER
+          Lox.error stmt.keyword, "Can't return a value from an initializer."
+        end
         resolve(stmt.value)
       end
       nil
