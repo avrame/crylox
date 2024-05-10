@@ -9,6 +9,7 @@ module Crylox
   enum ClassType
     NONE
     CLASS
+    SUBCLASS
   end
 
   class Resolver
@@ -45,6 +46,7 @@ module Crylox
       end
 
       if !stmt.superclass.nil?
+        @current_class = ClassType::SUBCLASS
         resolve(stmt.superclass)
       end
 
@@ -189,6 +191,11 @@ module Crylox
     end
 
     def visit_super_expr(expr : Super)
+      if @current_class == ClassType::NONE
+        Lox.error expr.keyword, "Can't use 'super' outside of a class."
+      elsif @current_class != ClassType::SUBCLASS
+        Lox.error expr.keyword, "Can't use 'super' in a class with no superclass."
+      end
       resolve_local(expr, expr.keyword)
       nil
     end
