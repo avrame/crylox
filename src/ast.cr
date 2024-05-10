@@ -96,6 +96,13 @@ module Crylox
       ],
     },
     {
+      class: Super,
+      fields: [
+        {type: Token, name: keyword},
+        {type: Token, name: method},
+      ]
+    },
+    {
       class: This,
       fields: [{type: Token, name: keyword}],
     },
@@ -132,6 +139,7 @@ module Crylox
       class:  Class,
       fields: [
         {type: Token, name: name},
+        {type: Variable | Nil, name: superclass},
         {type: Array(Function), name: methods},
       ],
     },

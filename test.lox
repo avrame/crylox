@@ -75,7 +75,14 @@ print "Test lambda END";
 print "";
 
 print "Test Class Start";
-class Dog {
+
+class Animal {
+  eat() {
+    print "nom nom nom nom!";
+  }
+}
+
+class Dog < Animal {
   init(name) {
     this.name = name;
   }
@@ -84,9 +91,16 @@ class Dog {
     print "Bark! " + foo;
     print "My name is " + this.name + "!";
   }
+
+  eat() {
+    super.eat();
+    print "Slobber!";
+  }
 }
 var dog = Dog("Blaze");
 dog.speak("Woof!");
+dog.name = "Fido";
 dog.speak("Grrr!");
+dog.eat();
 print "Test Class End";
 print "";

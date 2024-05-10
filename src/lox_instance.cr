@@ -2,7 +2,7 @@ module Crylox
   class LoxInstance
     @fields = Hash(String, LiteralType).new
 
-    def initialize(@klass : LoxClass)
+    def initialize(@class : LoxClass)
     end
 
     def get(name : Token)
@@ -10,7 +10,7 @@ module Crylox
         return @fields[name.lexeme]
       end
 
-      method = @klass.find_method(name.lexeme)
+      method = @class.find_method(name.lexeme)
       if !method.nil?
         return method.bind(self)
       end
@@ -23,7 +23,7 @@ module Crylox
     end
 
     def to_string
-      @klass.name + " instance"
+      @class.name + " instance"
     end
   end
 end

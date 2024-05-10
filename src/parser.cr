@@ -40,6 +40,13 @@ module Crylox
 
     def class_declaration
       name = consume :IDENTIFIER, "Expect class name."
+
+      superclass = nil
+      if match :LESS
+        consume :IDENTIFIER, "Expect superclass name."
+        superclass = Variable.new(previous())
+      end
+
       consume :LEFT_BRACE, "Expect '{' before class body."
 
       methods = [] of Function
@@ -48,7 +55,7 @@ module Crylox
       end
 
       consume :RIGHT_BRACE, "Expect '}' after class body."
-      return Class.new(name, methods)
+      return Class.new(name, superclass, methods)
     end
 
     def statement
@@ -387,6 +394,13 @@ module Crylox
         expr = expression()
         consume(:RIGHT_PAREN, "Expect ')' after expression.")
         return Grouping.new(expr)
+      end
+
+      if match :SUPER
+        keyword = previous()
+        consume :DOT, "Expect '.' after 'super'."
+        method = consume :IDENTIFIER, "Expect superclass method name."
+        return Super.new(keyword, method)
       end
 
       if match :THIS

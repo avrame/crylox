@@ -40,6 +40,19 @@ module Crylox
       declare(stmt.name)
       define(stmt.name)
 
+      if !stmt.superclass.nil? && stmt.name.lexeme == stmt.superclass.not_nil!.name.lexeme
+        Lox.error stmt.superclass.not_nil!.name, "A class can't inherit from itself."
+      end
+
+      if !stmt.superclass.nil?
+        resolve(stmt.superclass)
+      end
+
+      if !stmt.superclass.nil?
+        begin_scope()
+        @scopes[-1]["super"] = true
+      end
+
       begin_scope()
       @scopes[-1]["this"] = true
 
@@ -53,6 +66,10 @@ module Crylox
       end
 
       end_scope()
+
+      if !stmt.superclass.nil?
+        end_scope()
+      end
 
       @current_class = enclosing_class
       nil
@@ -168,6 +185,11 @@ module Crylox
     def visit_set_expr(expr : Set)
       resolve(expr.value)
       resolve(expr.object)
+      nil
+    end
+
+    def visit_super_expr(expr : Super)
+      resolve_local(expr, expr.keyword)
       nil
     end
 

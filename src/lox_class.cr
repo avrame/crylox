@@ -2,12 +2,16 @@ require "./lox_instance"
 
 module Crylox
   class LoxClass < LoxCallable
-    def initialize(@name : String, @methods : Hash(String, LoxFunction))
+    def initialize(@name : String, @superclass : LoxClass | Nil, @methods : Hash(String, LoxFunction))
     end
 
     def find_method(name : String)
       if @methods.has_key? name
         return @methods[name]
+      end
+
+      if !@superclass.nil?
+        return @superclass.not_nil!.find_method(name)
       end
 
       nil

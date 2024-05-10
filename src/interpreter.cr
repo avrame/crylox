@@ -66,6 +66,17 @@ module Crylox
       value
     end
 
+    def visit_super_expr(expr : Super)
+      distance = @locals[expr]
+      superclass = @environment.get_at(distance, "super").as(LoxClass)
+      object = @environment.get_at(distance - 1, "this").as(LoxInstance)
+      method = superclass.find_method(expr.method.lexeme)
+      if method.nil?
+        raise RuntimeException.new expr.method, "Undefined property '#{expr.method.lexeme}'."
+      end
+      return method.bind(object)
+    end
+
     def visit_this_expr(expr : This)
       look_up_variable(expr.keyword, expr)
     end
@@ -132,7 +143,20 @@ module Crylox
     end
 
     def visit_class_stmt(stmt : Class)
+      superclass = nil
+      if !stmt.superclass.nil?
+        superclass = evaluate(stmt.superclass.not_nil!)
+        if !superclass.is_a? LoxClass
+          raise RuntimeException.new stmt.superclass.not_nil!.name, "Superclass must be a class."
+        end
+      end
+
       @environment.define(stmt.name.lexeme, nil)
+
+      if !stmt.superclass.nil?
+        @environment = Environment.new(@environment)
+        @environment.define("super", superclass)
+      end
 
       methods = Hash(String, LoxFunction).new
       stmt.methods.each do |method|
@@ -140,7 +164,12 @@ module Crylox
         methods[method.name.lexeme] = function
       end
 
-      klass = LoxClass.new(stmt.name.lexeme, methods)
+      klass = LoxClass.new(stmt.name.lexeme, superclass, methods)
+
+      if !superclass.nil?
+        @environment = @environment.enclosing.not_nil!
+      end
+
       @environment.assign(stmt.name, klass)
       nil
     end
