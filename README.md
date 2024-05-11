@@ -1,18 +1,13 @@
 # crylox
 
-TODO: Write a description here
+This is an AST-walker interpreter written in Crystal for the Lox programming language. Crylox is the result of following the first part of Rob Nystrom's excellent [Crafting Interpreters](http://www.craftinginterpreters.com/) book.
 
 ## Installation
 
-TODO: Write installation instructions here
-
-## Usage
-
-TODO: Write usage instructions here
-
-## Development
-
-TODO: Write development instructions here
+1. Pull down the repo
+2. Install the [Crystal language](https://crystal-lang.org/install/)
+3. cd into the root dir and type `shards install`
+4. run the test.lox file using `crystal run src/crylox.cr -- test.lox`
 
 ## Contributing
 

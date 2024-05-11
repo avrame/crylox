@@ -7,7 +7,7 @@ module Crylox
     end
 
     def call(interpereter : Interpreter, arguments : Array(LiteralType)) : LiteralType
-      Time.monotonic.milliseconds / 1000.0
+      Time.monotonic.total_milliseconds / 1000.0
     end
 
     def to_string
